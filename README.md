@@ -89,7 +89,7 @@
           <div class="dot yellow"></div>
           <div class="dot green"></div>
         </div>
-        <div class="title">root@neo: ~ / <span style="opacity:.6; font-weight:500; margin-left:8px; font-size:12px">hacker-demo</span></div>
+        <div class="title">root@neo: ~ / <span style="opacity:.6; font-weight:500; margin-left:8px; font-size:12px">hacker-neojpn</span></div>
       </div>
 
       <div class="body">
@@ -99,8 +99,8 @@
         </div>
 
         <div class="panel">
-          <button class="btn" id="runBtn">▶ klik untuk mulai</button>
-          <button class="btn small" id="copyBtn">📋 Copy last output</button>
+          <button class="btn" id="runBtn">▶ klik untuk mulai text</button>
+          <button class="btn small" id="copyBtn">pencet mulai di atas blok</button>
           <div class="toggles">
             <label class="meta" style="margin-right:8px">Sound</label>
             <label class="switch">
@@ -126,7 +126,7 @@
 
       <div class="footer">
         <div>status: <strong id="status">idle</strong></div>
-        <div>made with ♥ -- <a class="link" href="#" onclick="alert('Customize the code!')">neo</a></div>
+        <div>made with ♥ -- <a class="link" href="#" onclick="alert('Customize the code!')">neojpn</a></div>
       </div>
     </div>
   </div>
@@ -185,23 +185,34 @@
     "Initializing secure channel...",
     "Halo bangsat…",
     "iki idamane bocah bocah🤣",
-    "Hbd Hbd bangsat…",
+    "dempul ko papan karambol…",
     "hahaha..",
     "lonte asu..",
-    "si paling tersakiti..",
-    "tapi ratau eleng karo polahe dw..",
-    "hahaha goblokk…..",
+    "kokop nek doyan hahaha..",
+    "nyawang rupane we ngasi radoyan mangan yekkk..",
+    "wedokan kongono di idam idamke…..",
     "semua aib' gmail foto video ig wa wes tak sadap..",
     "seng ndue akun gek colmek..: ✓",
     "kakean lanangan dadi oonn...",
     "open boo ready..",
-    "langsung wa (081212121213)",
+    "nyoh wa ne jare do njaluk (088232881008)",
+    "open bo,vcs dana pelajar..",
     "nego alus ful spek geol geol..",
-    "Brute forcing (this is fake demo) ...  ⭐⭐⭐  3 attempts",
+    "bandar lanangan hahaha..",
+    "huekkk.",
+    "wes oleh wane to??",
+    "kokop kokop hahaha...",
+    "sudah dulu ya bre",
+    "misi selesai..",
+    "next pindah korban lagi.",
+    "oh yo ojo macem macem nek aibmu ra pengen kesebar",
+    "aib foto tersimpain rapi digaleri"'
+    "siap edar ngasi macem macem",
+    "Brute forcing (this is real hacker) ...  ⭐⭐⭐⭐️  3 attempts",
     "Payload prepared: inject.tar.gz",
     "Deploying to /var/www/html/uploads ...",
     "✅ Deployment complete.",
-    "Opening backdoor (simulation)...",
+    "Opening backdoor (hacker neojpn)...",
     "Cleaning traces...",
     "Operation complete. Exit code: 0"
   ];
