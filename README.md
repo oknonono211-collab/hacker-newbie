@@ -1,2 +1,326 @@
-# hacker-newbie
-hacker
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hacker Terminal -- Cool HTML</title>
+  <style>
+    /* Reset sederhana */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html,body { height: 100%; font-family: "Source Code Pro", Consolas, Monaco, monospace; background:#000; color:#b7f28b; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+    /* Canvas matrix cover */
+    #matrix { position:fixed; inset:0; z-index:0; }
+    /* Center UI */
+    .wrap {
+      position:relative; z-index:2;
+      min-height:100vh; display:flex; align-items:center; justify-content:center;
+      padding:30px;
+    }
+    /* Glass terminal card */
+    .terminal {
+      width:min(1100px, 94vw);
+      background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.45));
+      border: 1px solid rgba(75,255,120,0.08);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.02);
+      backdrop-filter: blur(6px) saturate(120%);
+      border-radius:12px; padding:18px; overflow:hidden;
+    }
+    .topbar { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+    .dots { display:flex; gap:8px; }
+    .dot { width:12px; height:12px; border-radius:50%; box-shadow: 0 1px 0 rgba(0,0,0,0.6) inset; }
+    .dot.red { background:#ff5f56; }
+    .dot.yellow { background:#ffbd2e; }
+    .dot.green { background:#27c93f; }
+    .title { margin-left:auto; color: #8cf38a; font-weight:600; font-size:14px; letter-spacing:0.6px; opacity:0.95; }
+    .body {
+      display:grid; grid-template-columns: 1fr 360px; gap:18px;
+    }
+    /* left: terminal output */
+    .screen {
+      background: rgba(2,8,3,0.45);
+      border-radius:8px; padding:16px; min-height:420px; max-height:70vh;
+      overflow:auto; border:1px solid rgba(75,255,120,0.04);
+      box-shadow: 0 6px 30px rgba(6,24,12,0.6) inset;
+    }
+    .line { color:#b7f28b; font-size:14px; line-height:1.5; white-space:pre-wrap; }
+    .cursor { display:inline-block; width:10px; height:18px; background:#b7f28b; margin-left:8px; animation: blink 1s steps(2) infinite; vertical-align:middle; }
+    @keyframes blink { 50% { opacity:0; } }
+    /* right panel: controls */
+    .panel {
+      display:flex; flex-direction:column; gap:12px;
+      align-items:stretch;
+    }
+    button.btn {
+      background: linear-gradient(180deg, rgba(20,30,18,0.9), rgba(12,16,12,0.7));
+      border:1px solid rgba(75,255,120,0.08);
+      color:#cdefb8; font-weight:700; padding:10px 12px; border-radius:8px;
+      cursor:pointer; font-family:inherit; font-size:13px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+    }
+    button.btn:active { transform:translateY(1px); }
+    .small { font-size:12px; padding:8px 10px; }
+    .toggles { display:flex; gap:8px; align-items:center; }
+    label.switch { position:relative; display:inline-block; width:46px; height:26px; }
+    label.switch input { display:none; }
+    label.switch .track { position:absolute; inset:0; background:rgba(255,255,255,0.06); border-radius:999px; transition:all .2s; }
+    label.switch .thumb { position:absolute; top:3px; left:3px; width:20px; height:20px; background:#b7f28b; border-radius:50%; transition:all .2s; box-shadow:0 2px 6px rgba(0,0,0,0.6); }
+    label.switch input:checked + .track { background: rgba(140,243,138,0.18); }
+    label.switch input:checked + .track .thumb { transform: translateX(20px); background:#7ff08f; }
+    .meta { font-size:12px; color:#98e78c; opacity:0.9; }
+    /* footer */
+    .footer { margin-top:12px; display:flex; justify-content:space-between; align-items:center; color:#88e28b; font-size:13px; }
+    a.link { color:#b7f28b; text-decoration:none; border-bottom:1px dashed rgba(183,242,139,0.12); }
+    /* responsive */
+    @media (max-width:880px) {
+      .body { grid-template-columns:1fr; }
+      .panel { order:2; }
+      .screen { order:1; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+
+  <div class="wrap">
+    <div class="terminal" role="region" aria-label="Hacker terminal UI">
+      <div class="topbar">
+        <div class="dots">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+        </div>
+        <div class="title">root@neo: ~ / <span style="opacity:.6; font-weight:500; margin-left:8px; font-size:12px">hacker-demo</span></div>
+      </div>
+
+      <div class="body">
+        <div class="screen" id="screen" tabindex="0" aria-live="polite">
+          <!-- Lines appended by JS -->
+          <div class="line" id="welcome"></div>
+        </div>
+
+        <div class="panel">
+          <button class="btn" id="runBtn">▶ klik untuk mulai</button>
+          <button class="btn small" id="copyBtn">📋 Copy last output</button>
+          <div class="toggles">
+            <label class="meta" style="margin-right:8px">Sound</label>
+            <label class="switch">
+              <input type="checkbox" id="soundToggle" checked>
+              <span class="track"><span class="thumb"></span></span>
+            </label>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn small" id="clearBtn">Clear</button>
+            <button class="btn small" id="fullscreenBtn">Fullscreen</button>
+          </div>
+
+          <div style="margin-top:8px; padding:12px; border-radius:8px; background:rgba(0,0,0,0.32); border:1px solid rgba(75,255,120,0.03);">
+            <div class="meta">Shortcuts</div>
+            <ul style="margin-top:8px; color:#9fe9a0; font-size:13px; line-height:1.6">
+              <li><kbd>R</kbd> -- Run sequence</li>
+              <li><kbd>C</kbd> -- Clear</li>
+              <li><kbd>F</kbd> -- Fullscreen</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div>status: <strong id="status">idle</strong></div>
+        <div>made with ♥ -- <a class="link" href="#" onclick="alert('Customize the code!')">neo</a></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /*********************************************************
+   * MATRIX BACKGROUND (canvas)
+   *********************************************************/
+  (function matrix() {
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    let W, H;
+    function resize() {
+      W = canvas.width = innerWidth;
+      H = canvas.height = innerHeight;
+      columns = Math.floor(W / fontSize);
+      drops = new Array(columns).fill(1);
+    }
+    const fontSize = 14;
+    let columns = 0;
+    let drops = [];
+    const letters = "01あいうえおABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@#%&*+=-¥$".split('');
+    function draw() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.12)";
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "rgba(120, 255, 140, 0.9)";
+      ctx.font = fontSize + "px monospace";
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > H && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    let animId;
+    function loop(){ draw(); animId = requestAnimationFrame(loop); }
+    loop();
+  })();
+
+  /*********************************************************
+   * SIMPLE TERMINAL TYPING + LOGIC
+   *********************************************************/
+  const screen = document.getElementById('screen');
+  const welcome = document.getElementById('welcome');
+  const runBtn = document.getElementById('runBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const copyBtn = document.getElementById('copyBtn');
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
+  const soundToggle = document.getElementById('soundToggle');
+  const statusEl = document.getElementById('status');
+
+  // lines to "type"
+  const demoLines = [
+    "Initializing secure channel...",
+    "Halo bangsat…",
+    "iki idamane bocah bocah🤣",
+    "Hbd Hbd bangsat…",
+    "hahaha..",
+    "lonte asu..",
+    "si paling tersakiti..",
+    "tapi ratau eleng karo polahe dw..",
+    "hahaha goblokk…..",
+    "semua aib' gmail foto video ig wa wes tak sadap..",
+    "seng ndue akun gek colmek..: ✓",
+    "kakean lanangan dadi oonn...",
+    "open boo ready..",
+    "langsung wa (081212121213)",
+    "nego alus ful spek geol geol..",
+    "Brute forcing (this is fake demo) ...  ⭐⭐⭐  3 attempts",
+    "Payload prepared: inject.tar.gz",
+    "Deploying to /var/www/html/uploads ...",
+    "✅ Deployment complete.",
+    "Opening backdoor (simulation)...",
+    "Cleaning traces...",
+    "Operation complete. Exit code: 0"
+  ];
+
+  // queue printed text
+  let lastOutput = "";
+  function appendLine(text, speed = 12) {
+    return new Promise(resolve => {
+      const line = document.createElement('div');
+      line.className = 'line';
+      screen.appendChild(line);
+      screen.scrollTop = screen.scrollHeight;
+      let i = 0;
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor';
+      line.appendChild(document.createTextNode('')); // placeholder
+      line.appendChild(cursor);
+
+      const timer = setInterval(() => {
+        if (i >= text.length) {
+          clearInterval(timer);
+          line.removeChild(cursor);
+          lastOutput = text;
+          resolve();
+          return;
+        }
+        // insert next char before cursor
+        const charNode = document.createTextNode(text[i]);
+        line.insertBefore(charNode, cursor);
+        i++;
+        screen.scrollTop = screen.scrollHeight;
+      }, speed);
+    });
+  }
+
+  function beep(frequency=880, duration=0.05, type='sine') {
+    if (!soundToggle.checked) return;
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = type;
+      o.frequency.value = frequency;
+      o.connect(g); g.connect(ctx.destination);
+      g.gain.value = 0.0001;
+      o.start(0);
+      g.gain.exponentialRampToValueAtTime(0.12, ctx.currentTime + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + duration);
+      setTimeout(()=>{ o.stop(); ctx.close(); }, (duration+0.05)*1000);
+    } catch(e) { /* audio may fail on some browsers */ }
+  }
+
+  async function runSequence() {
+    statusEl.textContent = 'running';
+    runBtn.disabled = true;
+    for (let i=0;i<demoLines.length;i++) {
+      await appendLine("> " + demoLines[i], Math.max(6, 16 - Math.floor(i/2)));
+      beep(650 + i*20, 0.03, i%2? 'square':'sine');
+      await new Promise(r => setTimeout(r, 220 + Math.random()*180));
+    }
+    await appendLine("> end of log");
+    statusEl.textContent = 'idle';
+    runBtn.disabled = false;
+  }
+
+  runBtn.addEventListener('click', () => { beep(1000,0.05,'sine'); runSequence(); });
+
+  clearBtn.addEventListener('click', () => {
+    screen.innerHTML = '';
+    lastOutput = "";
+    welcome.textContent = "";
+    beep(600, 0.03, 'triangle');
+  });
+
+  copyBtn.addEventListener('click', async () => {
+    if (!lastOutput) {
+      alert('Belum ada output untuk dicopy -- jalankan sequence dulu.');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(lastOutput);
+      alert('Copied: ' + lastOutput);
+      beep(1200, 0.04, 'sine');
+    } catch (e) {
+      alert('Gagal copy -- browser tidak mengizinkan clipboard.');
+    }
+  });
+
+  fullscreenBtn.addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.();
+    } else {
+      document.exitFullscreen?.();
+    }
+  });
+
+  // keyboard shortcuts
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'r' || e.key === 'R') { runBtn.click(); }
+    if (e.key === 'c' || e.key === 'C') { clearBtn.click(); }
+    if (e.key === 'f' || e.key === 'F') { fullscreenBtn.click(); }
+  });
+
+  // initial welcome typing
+  (async function initWelcome() {
+    const text = "Welcome, operator.\nSystem: secure-demo v0.9\nType R to run sequence.";
+    await appendLine(text, 6);
+  })();
+
+  // make screen focusable & accessible
+  screen.addEventListener('click', () => screen.focus());
+
+  // small visual polish: subtle typing indicator every now and then
+  setInterval(() => {
+    const s = document.querySelector('.cursor');
+    if (!s) return;
+    s.style.background = '#9ff6a8';
+    setTimeout(()=> s.style.background='#b7f28b', 160);
+  }, 4200);
+  </script>
+</body>
+</html>
