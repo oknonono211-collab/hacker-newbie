@@ -191,12 +191,13 @@
     "kokop nek doyan hahaha..",
     "nyawang rupane we ngasi radoyan mangan yekkk..",
     "wedokan kongono di idam idamke…..",
-    "semua aib' gmail foto video ig wa wes tak sadap..",
+    "semua aib' mu ready turah turah..",
     "seng ndue akun gek colmek..: ✓",
     "kakean lanangan dadi oonn...",
-    "open boo ready..",
-    "nyoh wa ne jare do njaluk (088232881008)",
-    "open bo,vcs dana pelajar..",
+    "nyoh wa ne jare do njaluk(088232881008)",
+    "penak to rasah do dm' kesenengan bocae ngko",
+    "mendes abis ko tempek",
+    "open bo,vcs dana pelajar jare..",
     "nego alus ful spek geol geol..",
     "bandar lanangan hahaha..",
     "huekkk.",
@@ -206,7 +207,7 @@
     "misi selesai..",
     "next pindah korban lagi.",
     "oh yo ojo macem macem nek aibmu ra pengen kesebar",
-    "aib foto tersimpain rapi digaleri"'
+    "aib foto tersimpain rapi digaleri",
     "siap edar ngasi macem macem",
     "Brute forcing (this is real hacker) ...  ⭐⭐⭐⭐️  3 attempts",
     "Payload prepared: inject.tar.gz",
@@ -318,7 +319,7 @@
 
   // initial welcome typing
   (async function initWelcome() {
-    const text = "Welcome, operator.\nSystem: secure-demo v0.9\nType R to run sequence.";
+    const text = "Welcome, anak' ajg.\nSystem: secure-demo v0.9\npencet tombol dibawah untuk melihat text";
     await appendLine(text, 6);
   })();
 
